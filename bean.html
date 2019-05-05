@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>吃豆人</title>
+		<style>
+			#beanCanvas {
+				border:1px solid black;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="beanCanvas" width="500" height="500"></canvas>
+	</body>
+	<script>
+		let canvas = document.getElementById("beanCanvas")
+		let context = canvas.getContext("2d")
+		//绘制吃豆人
+		function Pacman () {
+			this.isOpen = true;//TODO 开关
+			this.Rstart = 45*Math.PI/180;
+			this.Rend = 315*Math.PI/180;
+			this.Lstart = 135*Math.PI/180;
+			this.Lend = 225*Math.PI/180;
+			this.Tstart = 225*Math.PI/180;
+			this.Tend = 315*Math.PI/180;
+			this.Bstart = 45*Math.PI/180;
+			this.Bend = 135*Math.PI/180;
+			this.x = 200//初始值X坐标
+			this.y = 200//初始值Y坐标
+			this.dire = 4//1右 2左 3上 4下
+			this.pointR = 10//豆的半径
+			this.pointX = 100//豆的X坐标
+			this.pointY = 100//豆的Y坐标
+ 			this.paint = function(){
+				//TODO 吃豆人的脸
+				context.beginPath();
+				if (this.dire == 1) {
+					context.arc(this.x,this.y,50,this.Rstart,this.Rend);
+					context.lineTo(this.x,this.y);
+				}
+				if (this.dire == 2) {
+					context.arc(this.x,this.y,50,this.Lstart,this.Lend,true);
+					context.lineTo(this.x,this.y);
+				}
+				if (this.dire == 3) {
+					context.arc(this.x,this.y,50,this.Tstart,this.Tend,true);
+					context.lineTo(this.x,this.y);
+				}
+				if (this.dire == 4) {
+					context.arc(this.x,this.y,50,this.Bstart,this.Bend,true);
+					context.lineTo(this.x,this.y);
+				}
+				context.closePath();
+				context.fillStyle = "yellow";
+				context.fill();
+				context.stroke();
+				//TODO 吃豆人的眼睛
+				if (this.dire == 1 || this.dire == 2) {
+					context.beginPath();
+					context.arc(this.x,this.y-25,10,0,Math.PI*2);
+					context.fillStyle = "black";
+					context.fill();
+					//TODO 吃豆人的眼神
+					context.beginPath();
+					context.arc(this.x,this.y-25,3,0,Math.PI*2);
+					context.fillStyle = "white";
+					context.fill();
+				}
+				if (this.dire == 3 || this.dire == 4) {
+					context.beginPath();
+					context.arc(this.x+25,this.y,10,0,Math.PI*2);
+					context.fillStyle = "black";
+					context.fill();
+					//TODO 吃豆人的眼神
+					context.beginPath();
+					context.arc(this.x+25,this.y,3,0,Math.PI*2);
+					context.fillStyle = "white";
+					context.fill();
+				}
+				this.point()
+			}
+		//TODO 2.控制开闭切换
+		this.open = function(){
+			if(this.isOpen && this.dire == 1){//TODO 开口
+				this.Rstart = 45*Math.PI/180;
+				this.Rend = 315*Math.PI/180;
+				this.isOpen = false;
+				}else if (!this.isOpen && this.dire == 1){//TODO 闭口
+				this.Rstart = 0;
+				this.Rend = Math.PI*2;
+				this.isOpen = true;
+			}
+			if(this.isOpen && this.dire == 2){//TODO 开口
+				this.Lstart = 135*Math.PI/180;
+				this.Lend = 225*Math.PI/180;
+				this.isOpen = false;
+				}else if (!this.isOpen && this.dire == 2){//TODO 闭口
+				this.Lstart = 180*Math.PI/180;
+				this.Lend = 180.5*Math.PI/180;
+				this.isOpen = true;
+			}
+			if(this.isOpen && this.dire == 3){//TODO 开口
+				this.Tstart = 225*Math.PI/180;
+				this.Tend = 315*Math.PI/180;
+				this.isOpen = false;
+				}else if (!this.isOpen && this.dire == 3){//TODO 闭口
+				this.Tstart = 270*Math.PI/180;
+				this.Tend = 270.5*Math.PI/180;
+				this.isOpen = true;
+			}
+			if(this.isOpen && this.dire == 4){//TODO 开口
+				this.Bstart = 45*Math.PI/180;
+				this.Bend = 135*Math.PI/180;
+				this.isOpen = false;
+				}else if (!this.isOpen && this.dire == 4){//TODO 闭口
+					this.Bstart = 90*Math.PI/180;
+					this.Bend = 91*Math.PI/180;
+					this.isOpen = true;
+				}
+		}
+		//吃豆人移动
+		this.go = function (dif = 10) {
+			if (this.x >= canvas.width-50) {
+				this.dire = 2
+			} else if (this.x <= 50) {
+				this.dire = 1
+			}
+			if (this.y >= canvas.height-50) {
+				this.dire = 3
+			} else if (this.y <= 50) {
+				this.dire = 4
+			}
+			if (this.dire == 1) {
+				this.x += dif
+			}
+			if (this.dire == 2) {
+				this.x -= dif
+			}
+			if (this.dire == 3) {
+				this.y -= dif
+			}
+			if (this.dire == 4) {
+				this.y += dif
+			}
+			this.crash()
+		}
+		//键盘上下左右
+		this.key = function () {
+			let that = this
+			document.onkeydown = function (e) {
+				//e.keyCode 37左 38上 39右 40下 
+				if (e.keyCode == 37) {
+					that.dire = 2
+				}
+				if (e.keyCode == 39) {
+					that.dire = 1
+				}
+				if (e.keyCode == 38) {
+					that.dire = 3
+				}
+				if (e.keyCode == 40) {
+					that.dire = 4
+				}
+				that.go()
+			}
+		}
+		//碰撞检测
+		this.crash = function () {
+			let R =  Math.abs(this.x - this.pointX) * Math.abs(this.x - this.pointX) + Math.abs(this.y - this.pointY) * Math.abs(this.y - this.pointY)
+			if (Math.sqrt(R) <= (this.pointR + 50)) {
+				this.site()
+			}
+		}
+		//碰撞之后豆的随机位置
+		this.site = function () {
+			this.pointX = Math.floor(Math.random() * (canvas.width - this.pointR*2 ) + this.pointR)
+			this.pointY = Math.floor(Math.random() * (canvas.height - this.pointR*2 ) + this.pointR)
+			console.log(this.pointX + '--' + this.pointY)
+		}
+		//随机的豆
+		this.point = function () {
+			context.beginPath()
+			context.arc(this.pointX,this.pointY,this.pointR,0,Math.PI*2)
+			context.fillStyle = "green"
+			context.fill()
+		}
+		//驱动器
+		this.inter = function (delay=200) {
+			let that = this
+			setInterval(function(){
+				context.clearRect(0,0,canvas.width,canvas.height)
+				that.paint()
+				that.open()
+				that.go()
+			},delay)
+		}
+	}
+	var pacman = new Pacman();
+	//TODO 核心控制器
+	//pacman.paint();
+	pacman.key()
+	pacman.inter()
+	</script>
+</html>
